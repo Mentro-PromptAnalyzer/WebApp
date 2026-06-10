@@ -48,11 +48,28 @@ Six dimensions, each averaged from prompt-level rubric scores:
 - **Engagement** — iteration, follow-up, and conversation length
 - **Overall Quality** — average of all six dimensions
 
-## MVP Constraints
+## Auth & Persistence
 
-- No user accounts, auth, or persistence
-- No LLM API key required — rule-based engine only
+- Supabase Auth: email/password + Google/GitHub OAuth via `@supabase/supabase-js` SDK
+- `AuthContext` (`src/context/AuthContext.tsx`) wraps the app; exposes `user`, `session`, `loading`, `signOut`
+- `ProtectedRoute` redirects unauthenticated users to `/auth`
+- Analyses are saved to `chat_histories` table in Supabase (columns: `user_id`, `title`, `overall_score`, `prompt_count`, `platform`, `analysis_result`, `created_at`)
+- Auth is optional for analysis — unauthenticated users can analyze but results are not persisted
+- When signed in, `saveAnalysis` in `src/lib/chatHistory.ts` persists the result after navigation to `/results`
+
+## Input
+
+- The input page accepts an AI chat **share link** (ChatGPT, Gemini, Perplexity) — no raw text paste
+- `src/analysis/linkParser.ts` detects platform, fetches the shared conversation via the proxy server, and extracts prompts
+- `detectPlatform(url)` returns the platform string passed to `saveAnalysis` and forwarded to `/results` as `detectedPlatform`
+
+## Other Features
+
+- `/chat` — streaming AI chat via Fly.dev backend (`/api/chat/stream`); no auth required; uses `chatClient.ts`
+- `/history` — protected; lists past analyses from `chat_histories` with score badge, prompt count, date; supports delete and re-open
+- `/dashboard` — protected; aggregate stats (avg scores, recent score, trend, platform breakdown) via `dashboardService.ts`; `DashboardStats` derived entirely from `chat_histories.analysis_result` JSON
+
+## Constraints
+
 - Desktop-first; basic responsiveness acceptable
-- One pasted or sample conversation per session
-- Demoable end-to-end in under two minutes
-- Five sample conversations available on the input page for demo purposes
+- Rule-based analysis engine only — no LLM for scoring (Groq is used server-side for the `/chat` feature only)

@@ -4,7 +4,7 @@
 
 - **React 19** with **TypeScript ~6**
 - **Vite 8** as build tool and dev server
-- **React Router v7** for client-side routing (two routes: `/` and `/results`)
+- **React Router v7** for client-side routing (6 routes: `/`, `/auth`, `/results`, `/chat`, `/history`, `/dashboard`)
 
 ## Styling
 
@@ -12,9 +12,14 @@
 - **clsx** + **tailwind-merge** for conditional class composition
 - **lucide-react** for icons
 
-## Charts
+## Auth & Data
 
-- **Recharts v3** for the prompt type distribution chart
+- **@supabase/supabase-js** for Supabase client (auth + database queries)
+- Supabase project: `anmsstuexchqyghqoipt`; public table `chat_histories` with RLS; credentials via `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+## Testing
+
+- **Vitest** + **fast-check** (property-based testing) — run with `npm run test` (`vitest --run`)
 
 ## Analysis Engine
 
@@ -22,14 +27,14 @@
 - No API keys, no database
 - Results are passed between pages via React Router `location.state`
 
-## Proxy Server (Share Link Feature)
+## Proxy Server (Share Link + Chat Streaming)
 
 - A small Express server lives in `server/` (Node.js, CommonJS)
-- Proxies ChatGPT share link fetches server-side to bypass browser CORS restrictions
-- Security: only allows HTTPS requests to `chatgpt.com` and `chat.openai.com` with `/share/` paths
-- Runs on port `3001` by default
-- Frontend calls it at `http://localhost:3001/api/fetch-share?url=<encoded>`
-- Configure a different base URL via the `VITE_PROXY_URL` env variable
+- Two endpoints:
+  - `GET /api/fetch-share?url=<encoded>` — proxies AI share link fetches to bypass CORS; restricted to HTTPS `chatgpt.com`, `chat.openai.com`, `gemini.google.com`, `perplexity.ai` with share paths
+  - `POST /api/chat/stream` — streams Groq LLM replies as SSE (`event: token`, `event: error`, `event: end`); requires Supabase JWT for rate limiting
+- Runs on port `3001` by default; deployed to Fly.dev (`https://mentro-lucid-dust-3580.fly.dev`)
+- Frontend reads base URL from `VITE_PROXY_URL` env variable
 
 ## Common Commands
 
@@ -39,6 +44,9 @@ npm install
 
 # Start frontend dev server (run from mentro/)
 npm run dev
+
+# Run tests once (run from mentro/)
+npm run test
 
 # Install server dependencies (run from server/)
 npm install
@@ -58,8 +66,8 @@ npm run lint
 
 ## Key Conventions
 
-- No test framework is currently configured — Vitest is planned but not yet set up
-- No shadcn/ui or Zod — the current stack uses plain Tailwind + custom components
+- No shadcn/ui or Zod — plain Tailwind + custom components
 - Tailwind v4 uses CSS-first config (`@import "tailwindcss"` in index.css); avoid adding a `tailwind.config.js`
 - Analysis engine lives in `src/analysis/` — keep it free of React imports
-- Sample conversations for demo live in `src/lib/sampleData.ts`
+- `src/context/AuthContext.tsx` provides `useAuth()` hook; wrap protected pages in `ProtectedRoute`
+- All Supabase calls use the SDK client from `src/lib/supabase.ts` — do not use raw fetch for auth

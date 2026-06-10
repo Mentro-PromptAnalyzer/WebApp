@@ -12,24 +12,40 @@ mentro/
 │   │   ├── rubric.ts         # Detects quality flags; scores 6 quality dimensions per prompt
 │   │   ├── patterns.ts       # Detects 12 behavioral patterns across the conversation
 │   │   ├── suggestions.ts    # Generates summary paragraph and dimension-driven suggestions
-│   │   ├── examples.ts       # Dolly 15k-inspired calibration examples (docs/tuning only)
+│   │   ├── linkParser.ts     # isAIShareUrl, getPromptsFromInput, detectPlatform, getLinkErrorMessage — fetches share links via proxy
+│   │   ├── costCalculator.ts # Token cost estimates
+│   │   ├── tokenEstimator.ts # Token count estimates
+│   │   ├── tokenConfig.ts    # Token pricing config
 │   │   └── analyzer.ts       # Public entry point: analyzeConversation(string[]) → AnalysisResult
+│   ├── context/
+│   │   └── AuthContext.tsx   # AuthProvider + useAuth() hook — wraps app, exposes user/session/loading/signOut
 │   ├── lib/
-│   │   └── sampleData.ts     # Sample conversation strings for demo/testing (5 scenarios)
-│   ├── components/           # Reusable UI components (results page building blocks)
-│   │   ├── ScoreCard.tsx     # Six score gauges (Autonomy, Curiosity, Critical Thinking, Specificity, Context, Engagement)
-│   │   ├── DistributionChart.tsx  # Recharts pie chart for intent category breakdown
-│   │   ├── PatternList.tsx   # Detected behavioral patterns with severity badges
-│   │   ├── PromptExamples.tsx     # Passive vs. active prompt highlights with intent + flag badges
-│   │   └── Suggestions.tsx   # Summary paragraph + numbered improvement suggestions
+│   │   ├── supabase.ts       # Supabase client (reads VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY)
+│   │   ├── chatHistory.ts    # saveAnalysis, fetchHistory, deleteHistory — CRUD on chat_histories table
+│   │   ├── dashboardService.ts  # getDashboardStats(userId) → DashboardStats; reads chat_histories
+│   │   └── chatClient.ts     # streamChatReply(messages, handlers) — SSE stream to /api/chat/stream
+│   ├── components/           # Reusable UI components
+│   │   ├── Header.tsx        # Fixed nav bar — logo, History/Dashboard links (auth-gated), sign in/out
+│   │   ├── ProtectedRoute.tsx # Redirects unauthenticated users to /auth
+│   │   ├── ComparisonCard.tsx     # Score comparison cards (avg vs recent) for DashboardPage
+│   │   ├── PlatformBreakdown.tsx  # Per-platform analysis counts for DashboardPage
+│   │   ├── ProgressIndicator.tsx  # Trend badge (improving/declining/stable) for DashboardPage
+│   │   ├── TrendChart.tsx         # Recharts line chart of overallQuality over time
+│   │   └── TokenUsageCard.tsx     # Token usage display card
 │   ├── pages/                # Route-level page components
-│   │   ├── InputPage.tsx     # "/" — transcript input, 5 sample loaders, analyze button
-│   │   └── ResultsPage.tsx   # "/results" — full analysis display
-│   ├── App.tsx               # Router setup (BrowserRouter, two routes)
+│   │   ├── InputPage.tsx     # "/" — hero section + share link input; saves analysis on success if signed in
+│   │   ├── AuthPage.tsx      # "/auth" — email/password + Google/GitHub OAuth; redirects to "/" if already signed in
+│   │   ├── ResultsPage.tsx   # "/results" — full analysis display; reads result + detectedPlatform from location.state
+│   │   ├── ChatPage.tsx      # "/chat" — streaming chat UI via chatClient; no auth required
+│   │   ├── HistoryPage.tsx   # "/history" — protected; past analyses list with delete + re-open
+│   │   └── DashboardPage.tsx # "/dashboard" — protected; aggregate stats, trend chart, platform breakdown
+│   ├── App.tsx               # Router setup (BrowserRouter, 6 routes + wildcard redirect to /)
 │   ├── main.tsx              # React entry point
 │   ├── index.css             # Global styles / Tailwind base (@import "tailwindcss")
 │   └── App.css               # App-level styles
 ├── public/
+│   ├── privacy.html          # Static privacy policy page
+│   └── logo.png
 ├── index.html
 ├── package.json
 ├── vite.config.ts
@@ -41,17 +57,21 @@ mentro/
 - `src/analysis/` is the analysis engine — keep it free of React imports. It must be callable from tests or a future API route without any UI dependency.
 - `src/components/` contains presentational components only. They receive typed props and do not call the analyzer directly.
 - `src/pages/` owns page-level state and wires analysis → components together.
-- Analysis results flow: `InputPage` calls `parseConversation` then `analyzeConversation`, then navigates to `/results` passing the `AnalysisResult` object via `location.state`. `ResultsPage` reads it from state and renders components.
+- `src/context/AuthContext.tsx` is the single source of auth state — all components use `useAuth()` to read it.
+- All Supabase calls go through the client in `src/lib/supabase.ts`. Do not instantiate a second client.
+- Protected pages must be wrapped in `ProtectedRoute` in `App.tsx`.
+- Analysis results flow: `InputPage` calls `getPromptsFromInput` (link fetch) → `analyzeConversation` → optionally `saveAnalysis` → navigates to `/results` with `{ result, detectedPlatform }` in `location.state`. `ResultsPage` reads it from state.
 - If `location.state` is missing on `/results`, redirect back to `/`.
 - All components import types from `src/analysis/types.ts` — not from `src/lib/`.
 
 ## Data Flow
 
 ```
-raw text → parser.ts → string[]
+share link → linkParser.ts (proxy fetch) → string[]
                      → classifier.ts (scoreIntents + primaryIntentFrom) → PromptIntent
                      → rubric.ts (detectFlags + scorePromptQuality) → QualityScores + flags
                      → analyzer.ts → AnalysisResult
+                                   → chatHistory.ts (saveAnalysis) → Supabase chat_histories
                                    → ResultsPage (via router state)
 ```
 
