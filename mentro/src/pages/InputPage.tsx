@@ -67,7 +67,7 @@ export function InputPage() {
         // Save failed silently
       }
     }
-    navigate('/results', { state: { result } });
+    navigate('/results', { state: { result, detectedPlatform: platform } });
   };
 
   // Inject keyframe animation once

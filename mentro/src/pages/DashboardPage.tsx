@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardStats, type DashboardStats } from '../lib/dashboardService';
 import { Header } from '../components/Header';
@@ -18,21 +17,15 @@ const TEXT_MUTED = '#a78bfa';
 
 export function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-      return;
-    }
-
     if (user) {
       loadDashboardData();
     }
-  }, [user, authLoading, navigate]);
+  }, [user]);
 
   async function loadDashboardData() {
     if (!user) return;

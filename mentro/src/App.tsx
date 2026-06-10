@@ -17,7 +17,14 @@ export default function App() {
           <Route path="/" element={<InputPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/results" element={<ResultsPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/history"
             element={
