@@ -34,10 +34,10 @@
 ## Common Commands
 
 ```bash
-# Install frontend dependencies (run from askbetter/)
+# Install frontend dependencies (run from mentro/)
 npm install
 
-# Start frontend dev server (run from askbetter/)
+# Start frontend dev server (run from mentro/)
 npm run dev
 
 # Install server dependencies (run from server/)
@@ -46,13 +46,13 @@ npm install
 # Start proxy server (run from server/)
 npm start
 
-# Type-check + production build (run from askbetter/)
+# Type-check + production build (run from mentro/)
 npm run build
 
-# Preview production build (run from askbetter/)
+# Preview production build (run from mentro/)
 npm run preview
 
-# Lint (run from askbetter/)
+# Lint (run from mentro/)
 npm run lint
 ```
 

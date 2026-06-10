@@ -1056,7 +1056,7 @@ app.post('/api/count-tokens', async (req, res) => {
 // Root
 // ---------------------------------------------------------------------------
 app.get('/', (_req, res) => {
-  res.send('Hello World from AskBetter server 👋');
+  res.send('Hello World from Mentro server 👋');
 });
 
 // ---------------------------------------------------------------------------
@@ -1101,5 +1101,5 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`AskBetter proxy server running on http://localhost:${PORT}`);
+  console.log(`Mentro proxy server running on http://localhost:${PORT}`);
 });

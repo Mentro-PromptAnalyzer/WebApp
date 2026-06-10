@@ -26,7 +26,7 @@ export function Header() {
         className="text-sm font-black uppercase tracking-widest"
         style={{ color: '#f5f3ff' }}
       >
-        Ask<span style={{ color: '#7c3aed' }}>Better</span>
+        Men<span style={{ color: '#7c3aed' }}>tro</span>
       </Link>
 
       {/* Auth controls */}

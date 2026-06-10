@@ -1,11 +1,11 @@
 {
-  "name": "askbetter-root",
+  "name": "mentro-root",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently --names \"server,client\" --prefix-colors \"yellow,cyan\" \"npm start --prefix server\" \"npm run dev --prefix askbetter\"",
-    "postinstall": "npm install --prefix askbetter && npm install --prefix server",
-    "format": "npm run format --prefix askbetter && npm run format --prefix server"
+    "dev": "concurrently --names \"server,client\" --prefix-colors \"yellow,cyan\" \"npm start --prefix server\" \"npm run dev --prefix mentro\"",
+    "postinstall": "npm install --prefix mentro && npm install --prefix server",
+    "format": "npm run format --prefix mentro && npm run format --prefix server"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

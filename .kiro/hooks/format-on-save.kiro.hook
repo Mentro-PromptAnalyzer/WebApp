@@ -8,7 +8,7 @@
   },
   "then": {
     "type": "runCommand",
-    "command": "server/node_modules/.bin/prettier --write askbetter/src server/index.js",
+    "command": "server/node_modules/.bin/prettier --write mentro/src server/index.js",
     "timeout": 30
   },
   "workspaceFolderName": "AskBetter-KiroHacks",

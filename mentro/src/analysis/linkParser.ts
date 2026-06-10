@@ -331,7 +331,7 @@ export function getLinkErrorMessage(errorCode: string): string {
 
   switch (errorCode) {
     case 'SERVER_UNREACHABLE':
-      return "The AskBetter proxy server isn't running. Please try again later.";
+      return "The Mentro proxy server isn't running. Please try again later.";
     case 'FETCH_FAILED':
       return "We couldn't fetch that shared conversation. The link may be private or expired.";
     case 'EXTRACTION_TOO_SHORT':

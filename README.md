@@ -1,4 +1,4 @@
-# AskBetter
+# Mentro
 
 **Better questions, better answers.**
 
@@ -6,9 +6,9 @@
 
 **Demo Login:** `eschiffler1122@gmail.com` / `Testing1!`
 
-## What is AskBetter?
+## What is Mentro?
 
-AskBetter is a web app that analyzes your AI conversations and helps you understand how you interact with tools like ChatGPT, Gemini, and Perplexity. Paste a share link from any supported platform, and AskBetter will break down your prompting habits — showing where you were passive, where you were active, and how to ask better questions.
+Mentro is a web app that analyzes your AI conversations and helps you understand how you interact with tools like ChatGPT, Gemini, and Perplexity. Paste a share link from any supported platform, and Mentro will break down your prompting habits — showing where you were passive, where you were active, and how to ask better questions.
 
 ### What it does
 
@@ -43,7 +43,7 @@ GROQ_API_KEY=your_groq_api_key
 # CHROMIUM_PATH=/path/to/chromium  (for Puppeteer fallback)
 ```
 
-Optional frontend override in `askbetter/.env.local`:
+Optional frontend override in `mentro/.env.local`:
 
 ```bash
 VITE_PROXY_URL=http://localhost:3001
@@ -63,7 +63,7 @@ Or separately:
 
 ```bash
 npm run start --prefix server
-npm run dev --prefix askbetter
+npm run dev --prefix mentro
 ```
 
 ## Tech Stack

@@ -1,8 +1,8 @@
-# AskBetter — Product Overview
+# Mentro — Product Overview
 
 **Slogan:** Better questions, better answers
 
-AskBetter is a desktop web app that analyzes a pasted ChatGPT conversation and helps users understand how they use AI. It identifies user prompts, classifies each by intent type, scores the overall conversation across six quality dimensions, and gives concrete suggestions for asking more active, curious, and thoughtful questions.
+Mentro is a desktop web app that analyzes a pasted ChatGPT conversation and helps users understand how they use AI. It identifies user prompts, classifies each by intent type, scores the overall conversation across six quality dimensions, and gives concrete suggestions for asking more active, curious, and thoughtful questions.
 
 ## Core Value
 

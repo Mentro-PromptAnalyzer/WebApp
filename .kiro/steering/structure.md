@@ -1,9 +1,9 @@
 # Project Structure
 
-All source code lives under `askbetter/`.
+All source code lives under `mentro/`.
 
 ```
-askbetter/
+mentro/
 ├── src/
 │   ├── analysis/             # Core analysis engine (framework-agnostic TS — no React imports)
 │   │   ├── types.ts          # All shared types: PromptIntent, AnalysisResult, QualityScores, etc.

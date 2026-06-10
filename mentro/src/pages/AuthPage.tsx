@@ -62,7 +62,7 @@ export function AuthPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold" style={{ color: '#f5f3ff' }}>
-            AskBetter
+            Mentro
           </h1>
           <p className="mt-1 text-sm" style={{ color: '#c4b5fd' }}>
             Better questions, better answers

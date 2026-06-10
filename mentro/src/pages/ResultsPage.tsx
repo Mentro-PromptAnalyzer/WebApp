@@ -496,7 +496,7 @@ export function ResultsPage() {
       })
       .join('\n\n');
 
-    const systemContent = `You are an AI prompt coach for AskBetter. The user pasted a chat history link and the app analyzed their prompts. Below is the full analysis data.
+    const systemContent = `You are an AI prompt coach for Mentro. The user pasted a chat history link and the app analyzed their prompts. Below is the full analysis data.
 
 IMPORTANT GUARDRAILS:
 - NEVER show raw JSON, data objects, or internal data structures to the user.
@@ -530,7 +530,7 @@ ${result.suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}`;
     }
 
     // If too long, split into system instruction + data messages
-    const instruction = `You are an AI prompt coach for AskBetter. The user's prompts and analysis data follow in the next messages.
+    const instruction = `You are an AI prompt coach for Mentro. The user's prompts and analysis data follow in the next messages.
 
 IMPORTANT GUARDRAILS:
 - NEVER show raw JSON, data objects, or internal data structures to the user.
