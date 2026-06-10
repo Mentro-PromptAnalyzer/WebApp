@@ -11,6 +11,6 @@
     "command": "server/node_modules/.bin/prettier --write mentro/src server/index.js",
     "timeout": 30
   },
-  "workspaceFolderName": "AskBetter-KiroHacks",
+  "workspaceFolderName": "Mentro",
   "shortName": "format-on-save"
 }
