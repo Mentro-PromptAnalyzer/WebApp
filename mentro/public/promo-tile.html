@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mentro — Promo Tile</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 440px;
+        height: 280px;
+        overflow: hidden;
+      }
+
+      .tile {
+        width: 440px;
+        height: 280px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(ellipse at 30% 50%, #3b0764 0%, transparent 65%),
+          radial-gradient(ellipse at 75% 30%, #4c1d95 0%, transparent 55%),
+          linear-gradient(135deg, #1a0533 0%, #0a0a0f 55%, #0f0420 100%);
+        border-radius: 12px;
+      }
+
+      .wordmark {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+          system-ui, sans-serif;
+        font-size: 72px;
+        font-weight: 700;
+        letter-spacing: -2.5px;
+        line-height: 1;
+        /* Render as a single inline text block so M and entro are flush */
+        display: flex;
+        align-items: baseline;
+      }
+
+      .letter-m {
+        /* White with purple glow — matches the icon style */
+        color: #ffffff;
+        text-shadow:
+          0 0 20px rgba(167, 139, 250, 0.9),
+          0 0 50px rgba(139, 92, 246, 0.6),
+          0 0 90px rgba(109, 40, 217, 0.35);
+      }
+
+      .letter-rest {
+        /* Slightly softer white, no glow so it doesn't compete */
+        color: #f0e9ff;
+        text-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="tile">
+      <div class="wordmark">
+        <span class="letter-m">M</span><span class="letter-rest">entro</span>
+      </div>
+    </div>
+  </body>
+</html>
