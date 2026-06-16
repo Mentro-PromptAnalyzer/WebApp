@@ -8,7 +8,7 @@
   },
   "then": {
     "type": "runCommand",
-    "command": "server/node_modules/.bin/prettier --write mentro/src server/index.js",
+    "command": "npx --prefix mentro prettier --write mentro/src && npx --prefix server prettier --write server/index.js",
     "timeout": 30
   },
   "workspaceFolderName": "Mentro",
