@@ -115,7 +115,7 @@
       <header>
         <div class="logo">Mentro</div>
         <h1>Privacy Policy</h1>
-        <p class="meta">Effective date: June 10, 2026 &nbsp;·&nbsp; Last updated: June 10, 2026</p>
+        <p class="meta">Effective date: June 10, 2026 &nbsp;·&nbsp; Last updated: June 28, 2026</p>
       </header>
 
       <div class="section">
@@ -146,40 +146,52 @@
           </li>
         </ul>
 
-        <p><strong>Prompt text</strong></p>
+        <p><strong>Prompt text — real-time scoring</strong></p>
         <ul>
           <li>
             The text you type into ChatGPT, Gemini, Perplexity, or Claude is read by the Extension
             in order to compute a real-time quality score.
           </li>
           <li>
-            Prompts you submit (hit send) are stored in your account history in our Supabase
-            database, associated with your user ID and the platform you used.
+            The primary (heuristic) scoring layer runs entirely on your device — your prompt text
+            never leaves your browser for this step.
           </li>
           <li>
-            For AI-powered scoring, your prompt text is sent to our backend server hosted on
-            Fly.dev, which forwards it to the Groq API. Neither we nor Groq retain prompt text
-            beyond the duration of the request.
+            For AI-powered scoring (the secondary layer, fired ~1.5 seconds after you stop typing),
+            your prompt text is sent to our backend server hosted on Fly.dev, which forwards it to
+            the Groq API to generate quality scores and improvement suggestions. Neither we nor Groq
+            retain prompt text beyond the duration of the request.
+          </li>
+          <li>
+            <strong>Prompt text is never stored in our database.</strong> Only the metadata
+            described below is persisted.
           </li>
         </ul>
 
-        <p><strong>Usage data</strong></p>
+        <p><strong>Prompt metadata (stored, opt-out available)</strong></p>
         <ul>
           <li>
-            Aggregate scoring statistics (average score, session count, platform usage) are stored
-            in your account to populate the popup dashboard.
+            When you submit a prompt (hit send), the following metadata is stored in your account
+            history: word count, quality scores (overall, ownership, depth, critical, clarity),
+            detected intent category, the AI platform used, and a timestamp.
           </li>
           <li>
-            Word count metadata per prompt is stored as part of your session history to show prompt
-            length distribution in your dashboard.
+            This metadata is used to populate your personal dashboard (average score, prompt
+            length distribution, intent breakdown, platform stats).
+          </li>
+          <li>
+            <strong>You can disable this collection at any time.</strong> Open the Extension popup,
+            go to Settings, and turn off "Collect prompt stats". When this is off, no metadata is
+            stored when you submit a prompt.
           </li>
         </ul>
 
         <p><strong>Settings</strong></p>
         <ul>
           <li>
-            Your Extension settings (badge enabled/disabled, pills enabled/disabled) are stored in
-            <code>chrome.storage.sync</code>, which syncs across your Chrome profile.
+            Your Extension settings (badge enabled/disabled, pills enabled/disabled, stat collection
+            on/off) are stored in <code>chrome.storage.sync</code>, which syncs across your Chrome
+            profile.
           </li>
         </ul>
       </div>
@@ -190,8 +202,8 @@
           <li>To authenticate you and maintain your session.</li>
           <li>To compute real-time prompt quality scores as you type.</li>
           <li>
-            To store your prompt history and statistics so you can review your prompting habits in
-            the dashboard.
+            To store prompt metadata (when stat collection is enabled) so you can review your
+            prompting habits in the dashboard.
           </li>
           <li>To sync your settings across devices via your Chrome profile.</li>
         </ul>
@@ -208,7 +220,7 @@
 
         <p><strong>Supabase</strong> — database and authentication</p>
         <ul>
-          <li>Stores your account (email, hashed password), session tokens, and prompt history.</li>
+          <li>Stores your account (email, hashed password), session tokens, and prompt metadata.</li>
           <li>
             Email/password auth and OAuth token exchange are handled directly by Supabase Auth.
           </li>
@@ -224,9 +236,14 @@
         <ul>
           <li>
             Prompt text is forwarded to Groq's API to generate AI-powered quality scores and
-            suggestions.
+            suggestions. This only occurs when AI scoring is active (approximately 1.5 seconds after
+            you stop typing, while you are signed in).
           </li>
-          <li>Requests are proxied through our backend; your Supabase token is used to authenticate the request.</li>
+          <li>
+            Requests are proxied through our backend and authenticated with your Supabase JWT.
+            Prompt text is not retained by our backend or by Groq beyond the duration of the
+            request.
+          </li>
           <li>
             Privacy policy:
             <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer"
@@ -237,7 +254,10 @@
 
         <p><strong>Google OAuth / GitHub OAuth</strong> — sign-in</p>
         <ul>
-          <li>If you choose to sign in with Google or GitHub, the OAuth flow is handled by those providers via Supabase Auth.</li>
+          <li>
+            If you choose to sign in with Google or GitHub, the OAuth flow is handled by those
+            providers via Supabase Auth.
+          </li>
           <li>We only receive your email address from the OAuth provider.</li>
           <li>
             Google privacy policy:
@@ -250,7 +270,10 @@
           </li>
           <li>
             GitHub privacy policy:
-            <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer"
+            <a
+              href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+              target="_blank"
+              rel="noopener noreferrer"
               >GitHub Privacy Statement</a
             >
           </li>
@@ -265,11 +288,17 @@
             are cleared when you sign out.
           </li>
           <li>
-            Account data and prompt history are stored in Supabase and are retained until you delete
-            your account.
+            Account data and prompt metadata are stored in Supabase and are retained until you
+            delete them or delete your account.
           </li>
           <li>
-            To delete your account and all associated data, contact us at the email address below.
+            <strong>Self-service deletion:</strong> You can permanently delete all your stored
+            prompt stats at any time from the Extension popup — go to the Settings tab and tap
+            "Delete my data". This removes all prompt metadata associated with your account from
+            our database immediately.
+          </li>
+          <li>
+            To delete your account entirely, contact us at the email address below.
           </li>
         </ul>
       </div>
@@ -279,7 +308,9 @@
         <p>The Extension requests the following Chrome permissions:</p>
         <ul>
           <li>
-            <strong>storage</strong> — to save your session and settings locally and synced.
+            <strong>storage</strong> — to save your session and settings locally
+            (<code>chrome.storage.local</code>) and synced across devices
+            (<code>chrome.storage.sync</code>).
           </li>
           <li>
             <strong>activeTab</strong> — to read the prompt you are typing in the active AI
@@ -290,10 +321,21 @@
             <code>chrome.identity.launchWebAuthFlow</code>.
           </li>
           <li>
+            <strong>tabs</strong> — to broadcast settings changes (badge on/off, pills on/off,
+            stat collection on/off) to all open AI platform tabs immediately when you change a
+            setting in the popup.
+          </li>
+          <li>
             <strong>host permissions</strong> for <code>chatgpt.com</code>,
             <code>chat.openai.com</code>, <code>gemini.google.com</code>,
-            <code>perplexity.ai</code>, <code>claude.ai</code> — to inject the content script that
-            observes the prompt input on those pages.
+            <code>perplexity.ai</code>, <code>www.perplexity.ai</code>, and
+            <code>claude.ai</code> — to inject the content script that observes the prompt input
+            on those pages.
+          </li>
+          <li>
+            <strong>host permission</strong> for
+            <code>mentro-lucid-dust-3580.fly.dev</code> — to allow the background service worker
+            to send AI scoring requests to our backend.
           </li>
         </ul>
         <p>No other permissions are requested or used.</p>
@@ -320,7 +362,7 @@
       <div class="section">
         <h2>Contact</h2>
         <p>
-          Questions about this policy or requests to delete your data can be sent to:<br />
+          Questions about this policy or requests to delete your account can be sent to:<br />
           <a href="mailto:mentrosupport@gmail.com">mentrosupport@gmail.com</a>
         </p>
       </div>

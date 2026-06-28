@@ -15,6 +15,8 @@
 ## Auth & Data
 
 - **@supabase/supabase-js** for Supabase client (auth + database queries)
+- **recharts** for dashboard trend charts
+- **js-tiktoken** for client-side token counting
 - Supabase project: `anmsstuexchqyghqoipt`; public table `chat_histories` with RLS; credentials via `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`
 
 ## Testing
@@ -29,11 +31,11 @@
 
 ## Proxy Server (Share Link + Chat Streaming)
 
-- A small Express server lives in `server/` (Node.js, CommonJS)
-- Two endpoints:
+- The Express proxy server has been extracted to a separate repository (`Mentro-PromptAnalyzer/server`) — it is **not** in this repo
+- Two endpoints (same contract as before):
   - `GET /api/fetch-share?url=<encoded>` — proxies AI share link fetches to bypass CORS; restricted to HTTPS `chatgpt.com`, `chat.openai.com`, `gemini.google.com`, `perplexity.ai` with share paths
   - `POST /api/chat/stream` — streams Groq LLM replies as SSE (`event: token`, `event: error`, `event: end`); requires Supabase JWT for rate limiting
-- Runs on port `3001` by default; deployed to Fly.dev (`https://mentro-lucid-dust-3580.fly.dev`)
+- Deployed to Fly.dev (`https://mentro-lucid-dust-3580.fly.dev`); default local port `3001`
 - Frontend reads base URL from `VITE_PROXY_URL` env variable
 
 ## Common Commands
@@ -48,11 +50,11 @@ npm run dev
 # Run tests once (run from mentro/)
 npm run test
 
-# Install server dependencies (run from server/)
-npm install
+# Format code (run from mentro/)
+npm run format
 
-# Start proxy server (run from server/)
-npm start
+# Check formatting (run from mentro/)
+npm run format:check
 
 # Type-check + production build (run from mentro/)
 npm run build

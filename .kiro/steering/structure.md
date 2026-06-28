@@ -12,9 +12,9 @@ mentro/
 │   │   ├── rubric.ts         # Detects quality flags; scores 6 quality dimensions per prompt
 │   │   ├── patterns.ts       # Detects 12 behavioral patterns across the conversation
 │   │   ├── suggestions.ts    # Generates summary paragraph and dimension-driven suggestions
-│   │   ├── linkParser.ts     # isAIShareUrl, getPromptsFromInput, detectPlatform, getLinkErrorMessage — fetches share links via proxy
+│   │   ├── linkParser.ts     # isAIShareUrl, getPromptsFromInput, getPromptsAndTimestamp, detectPlatform, getLinkErrorMessage — fetches share links via proxy; getPromptsAndTimestamp also returns chatCreatedAt
 │   │   ├── costCalculator.ts # Token cost estimates
-│   │   ├── tokenEstimator.ts # Token count estimates
+│   │   ├── tokenEstimator.ts # Token count estimates (uses js-tiktoken)
 │   │   ├── tokenConfig.ts    # Token pricing config
 │   │   └── analyzer.ts       # Public entry point: analyzeConversation(string[]) → AnalysisResult
 │   ├── context/
@@ -22,7 +22,7 @@ mentro/
 │   ├── lib/
 │   │   ├── supabase.ts       # Supabase client (reads VITE_SUPABASE_URL + VITE_SUPABASE_PUBLISHABLE_KEY)
 │   │   ├── chatHistory.ts    # saveAnalysis, fetchHistory, deleteHistory — CRUD on chat_histories table
-│   │   ├── dashboardService.ts  # getDashboardStats(userId) → DashboardStats; reads chat_histories
+│   │   ├── dashboardService.ts  # getDashboardStats(userId) → DashboardStats; exports AnalysisHistory + DashboardStats interfaces; reads chat_histories
 │   │   └── chatClient.ts     # streamChatReply(messages, handlers) — SSE stream to /api/chat/stream
 │   ├── components/           # Reusable UI components
 │   │   ├── Header.tsx        # Fixed nav bar — logo, History/Dashboard links (auth-gated), sign in/out
@@ -67,13 +67,15 @@ mentro/
 ## Data Flow
 
 ```
-share link → linkParser.ts (proxy fetch) → string[]
+share link → linkParser.ts (proxy fetch via getPromptsAndTimestamp) → string[] + chatCreatedAt
                      → classifier.ts (scoreIntents + primaryIntentFrom) → PromptIntent
                      → rubric.ts (detectFlags + scorePromptQuality) → QualityScores + flags
                      → analyzer.ts → AnalysisResult
                                    → chatHistory.ts (saveAnalysis) → Supabase chat_histories
                                    → ResultsPage (via router state)
 ```
+
+Note: `getPromptsFromInput` is the simpler variant (returns `{ prompts, chatCreatedAt: null }`). `getPromptsAndTimestamp` fetches raw HTML via proxy and also extracts `chatCreatedAt` from the page.
 
 ## Key Types (src/analysis/types.ts)
 
