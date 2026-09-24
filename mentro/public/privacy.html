@@ -23,7 +23,7 @@
       body {
         background: var(--bg);
         color: var(--text);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 16px;
         line-height: 1.7;
         padding: 2rem 1rem 4rem;
@@ -176,8 +176,8 @@
             detected intent category, the AI platform used, and a timestamp.
           </li>
           <li>
-            This metadata is used to populate your personal dashboard (average score, prompt
-            length distribution, intent breakdown, platform stats).
+            This metadata is used to populate your personal dashboard (average score, prompt length
+            distribution, intent breakdown, platform stats).
           </li>
           <li>
             <strong>You can disable this collection at any time.</strong> Open the Extension popup,
@@ -220,7 +220,9 @@
 
         <p><strong>Supabase</strong> — database and authentication</p>
         <ul>
-          <li>Stores your account (email, hashed password), session tokens, and prompt metadata.</li>
+          <li>
+            Stores your account (email, hashed password), session tokens, and prompt metadata.
+          </li>
           <li>
             Email/password auth and OAuth token exchange are handled directly by Supabase Auth.
           </li>
@@ -261,10 +263,7 @@
           <li>We only receive your email address from the OAuth provider.</li>
           <li>
             Google privacy policy:
-            <a
-              href="https://policies.google.com/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"
               >policies.google.com/privacy</a
             >
           </li>
@@ -294,12 +293,10 @@
           <li>
             <strong>Self-service deletion:</strong> You can permanently delete all your stored
             prompt stats at any time from the Extension popup — go to the Settings tab and tap
-            "Delete my data". This removes all prompt metadata associated with your account from
-            our database immediately.
+            "Delete my data". This removes all prompt metadata associated with your account from our
+            database immediately.
           </li>
-          <li>
-            To delete your account entirely, contact us at the email address below.
-          </li>
+          <li>To delete your account entirely, contact us at the email address below.</li>
         </ul>
       </div>
 
@@ -313,29 +310,27 @@
             (<code>chrome.storage.sync</code>).
           </li>
           <li>
-            <strong>activeTab</strong> — to read the prompt you are typing in the active AI
-            platform tab.
+            <strong>activeTab</strong> — to read the prompt you are typing in the active AI platform
+            tab.
           </li>
           <li>
             <strong>identity</strong> — to launch the Google/GitHub OAuth sign-in flow via
             <code>chrome.identity.launchWebAuthFlow</code>.
           </li>
           <li>
-            <strong>tabs</strong> — to broadcast settings changes (badge on/off, pills on/off,
-            stat collection on/off) to all open AI platform tabs immediately when you change a
-            setting in the popup.
+            <strong>tabs</strong> — to broadcast settings changes (badge on/off, pills on/off, stat
+            collection on/off) to all open AI platform tabs immediately when you change a setting in
+            the popup.
           </li>
           <li>
             <strong>host permissions</strong> for <code>chatgpt.com</code>,
             <code>chat.openai.com</code>, <code>gemini.google.com</code>,
-            <code>perplexity.ai</code>, <code>www.perplexity.ai</code>, and
-            <code>claude.ai</code> — to inject the content script that observes the prompt input
-            on those pages.
+            <code>perplexity.ai</code>, <code>www.perplexity.ai</code>, and <code>claude.ai</code> —
+            to inject the content script that observes the prompt input on those pages.
           </li>
           <li>
-            <strong>host permission</strong> for
-            <code>mentro-lucid-dust-3580.fly.dev</code> — to allow the background service worker
-            to send AI scoring requests to our backend.
+            <strong>host permission</strong> for <code>mentro-lucid-dust-3580.fly.dev</code> — to
+            allow the background service worker to send AI scoring requests to our backend.
           </li>
         </ul>
         <p>No other permissions are requested or used.</p>

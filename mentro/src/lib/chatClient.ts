@@ -1,11 +1,12 @@
+import { API_BASE as PROXY_BASE } from './apiConfig';
+import { supabase } from './supabase';
+
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 export interface ChatMessage {
   role: ChatRole;
   content: string;
 }
-
-const PROXY_BASE: string = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
 
 interface StreamHandlers {
   onToken: (text: string) => void;
@@ -33,9 +34,16 @@ function getErrorMessageForStatus(status: number, defaultMessage: string): strin
 
 export async function streamChatReply(messages: ChatMessage[], handlers: StreamHandlers) {
   try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error || !data.session?.access_token) {
+      throw new Error('Please sign in to use live chat.', { cause: error });
+    }
     const response = await fetch(`${PROXY_BASE}/api/chat/stream`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${data.session.access_token}`,
+      },
       body: JSON.stringify({ messages }),
     });
 
@@ -113,7 +121,7 @@ export async function streamChatReply(messages: ChatMessage[], handlers: StreamH
   } catch (error) {
     // Handle network errors
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Network error - please check your connection');
+      throw new Error('Network error - please check your connection', { cause: error });
     }
     throw error;
   }
