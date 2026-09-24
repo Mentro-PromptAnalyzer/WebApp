@@ -51,38 +51,38 @@ The image does not receive an env file or privileged key.
 Results below are from the active worktree validation snapshot; this document
 edit did not rerun the checks.
 
-| Check | Result | Evidence |
-| --- | --- | --- |
-| Install | PASS | `cd mentro; npm ci` completed with the committed lockfile. |
-| Formatting | FAIL | `npm run format:check` still reports the baseline files `public/privacy.html` and `public/promo-tile.html`. `vitest.config.ts` has since been formatted. |
-| Lint | FAIL | `npm run lint` reports 15 errors and 1 warning. Existing findings include `TrendChart` use of `any`, `AuthContext` Fast Refresh export, `chatClient` cause handling, `ResultsPage` conditional hooks and mutation, and the `Dashboard` dependency warning. These remain visible for separate review. |
-| Tests | PASS | `npm test` runs 10 meaningful `build-environment.test.ts` tests and passes. The earlier baseline discovered zero tests; that baseline is superseded by these tests. |
-| TypeScript and production build | PASS | `npm run build` completes TypeScript and Vite production builds with explicit local public configuration. Built JavaScript is approximately 6,498,430 bytes. |
-| Container HTTP smoke | PASS | `npm run test:smoke` passed one test against the running image: explicit health, deep-route fallback, missing-asset 404s, MIME/cache behavior, and local public API/Auth URLs without a privileged-key marker. |
-| Browser preview | PASS, limited | Desktop at 1440×900 rendered Home then Log In. Mobile at 390×844 reloaded Auth and Home. Browser console errors and warnings were empty. Login was not attempted because the isolated Auth service was unavailable. |
-| Runtime and idle use | PASS | Container ran as uid/gid 101 with a read-only root and no application process in the static image. Stop/start returned healthy in under 60 seconds. Idle sample: about 5 MiB, 0% CPU, 3 PIDs. Compose config declares a 10-second stop grace, 128 MiB memory limit, 0.5 CPU, 64-PID limit, `/tmp` tmpfs, dropped capabilities, no-new-privileges, and rotated logs. |
-| Remote CI | PENDING | PR checks have not completed for the final PR commit. The known formatting and lint baseline failures are expected to keep `quality` red unless separately resolved. |
+| Check                           | Result        | Evidence                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Install                         | PASS          | `cd mentro; npm ci` completed with the committed lockfile.                                                                                                                                                                                                                                                                                                          |
+| Formatting                      | FAIL          | `npm run format:check` still reports the baseline files `public/privacy.html` and `public/promo-tile.html`. `vitest.config.ts` has since been formatted.                                                                                                                                                                                                            |
+| Lint                            | FAIL          | `npm run lint` reports 15 errors and 1 warning. Existing findings include `TrendChart` use of `any`, `AuthContext` Fast Refresh export, `chatClient` cause handling, `ResultsPage` conditional hooks and mutation, and the `Dashboard` dependency warning. These remain visible for separate review.                                                                |
+| Tests                           | PASS          | `npm test` runs 10 meaningful `build-environment.test.ts` tests and passes. The earlier baseline discovered zero tests; that baseline is superseded by these tests.                                                                                                                                                                                                 |
+| TypeScript and production build | PASS          | `npm run build` completes TypeScript and Vite production builds with explicit local public configuration. Built JavaScript is approximately 6,498,430 bytes.                                                                                                                                                                                                        |
+| Container HTTP smoke            | PASS          | `npm run test:smoke` passed one test against the running image: explicit health, deep-route fallback, missing-asset 404s, MIME/cache behavior, and local public API/Auth URLs without a privileged-key marker.                                                                                                                                                      |
+| Browser preview                 | PASS, limited | Desktop at 1440×900 rendered Home then Log In. Mobile at 390×844 reloaded Auth and Home. Browser console errors and warnings were empty. Login was not attempted because the isolated Auth service was unavailable.                                                                                                                                                 |
+| Runtime and idle use            | PASS          | Container ran as uid/gid 101 with a read-only root and no application process in the static image. Stop/start returned healthy in under 60 seconds. Idle sample: about 5 MiB, 0% CPU, 3 PIDs. Compose config declares a 10-second stop grace, 128 MiB memory limit, 0.5 CPU, 64-PID limit, `/tmp` tmpfs, dropped capabilities, no-new-privileges, and rotated logs. |
+| Remote CI                       | PENDING       | PR checks have not completed for the final PR commit. The known formatting and lint baseline failures are expected to keep `quality` red unless separately resolved.                                                                                                                                                                                                |
 
 ## Shared repository gate
 
-| Gate | Status | Evidence and remaining work |
-| --- | --- | --- |
-| S1 | BLOCKED | Locked install, configured build, runtime documentation, and digest-pinned image bases are present. A clean-checkout run and an exact image identity for the dirty local build were not recorded. |
-| S2 | FAIL | Test and build checks pass, but formatting and lint fail on the listed existing findings. Keep them visible; do not weaken the checks to clear this gate. |
-| S3 | BLOCKED | Health and stop/start recovery passed within 60 seconds. The measured shutdown duration against the configured 10-second grace period was not recorded. Health is for the static frontend only and does not establish API, Auth, or history readiness. |
-| S4 | PASS | Runtime identity, read-only operation, and absence of an application process were inspected. Resource limits, tmpfs, capabilities, log rotation, and loopback binding are configured; idle use was sampled above. |
-| S5 | BLOCKED | The production frontend build contains the configured browser-facing local API address, but no proxy server is running in this stack. Real API requests, preflight behavior, and end-to-end browser journeys remain unverified. |
-| S6 | BLOCKED | Ten build-environment tests cover required public configuration and local-preview destination guards. The container smoke confirms local API/Auth URLs and no privileged-key marker in built JavaScript, but no service requests were observed because the server and Auth service were unavailable. |
-| S7 | BLOCKED | `quality` and `container` are configured for pull requests and pushes to `main` without production credentials. Final PR CI is pending; branch-protection enforcement has not been checked. |
-| S8 | PASS, local static service | [The container runbook](container-runbook.md) documents startup, health/log inspection, stop, restart, and recovery. The preview has no local persistence volume; Auth and history remain external. Start/recovery was observed, with the shutdown timing limitation noted under S3. |
+| Gate | Status                     | Evidence and remaining work                                                                                                                                                                                                                                                                          |
+| ---- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S1   | BLOCKED                    | Locked install, configured build, runtime documentation, and digest-pinned image bases are present. A clean-checkout run and an exact image identity for the dirty local build were not recorded.                                                                                                    |
+| S2   | FAIL                       | Test and build checks pass, but formatting and lint fail on the listed existing findings. Keep them visible; do not weaken the checks to clear this gate.                                                                                                                                            |
+| S3   | BLOCKED                    | Health and stop/start recovery passed within 60 seconds. The measured shutdown duration against the configured 10-second grace period was not recorded. Health is for the static frontend only and does not establish API, Auth, or history readiness.                                               |
+| S4   | PASS                       | Runtime identity, read-only operation, and absence of an application process were inspected. Resource limits, tmpfs, capabilities, log rotation, and loopback binding are configured; idle use was sampled above.                                                                                    |
+| S5   | BLOCKED                    | The production frontend build contains the configured browser-facing local API address, but no proxy server is running in this stack. Real API requests, preflight behavior, and end-to-end browser journeys remain unverified.                                                                      |
+| S6   | BLOCKED                    | Ten build-environment tests cover required public configuration and local-preview destination guards. The container smoke confirms local API/Auth URLs and no privileged-key marker in built JavaScript, but no service requests were observed because the server and Auth service were unavailable. |
+| S7   | BLOCKED                    | `quality` and `container` are configured for pull requests and pushes to `main` without production credentials. Final PR CI is pending; branch-protection enforcement has not been checked.                                                                                                          |
+| S8   | PASS, local static service | [The container runbook](container-runbook.md) documents startup, health/log inspection, stop, restart, and recovery. The preview has no local persistence volume; Auth and history remain external. Start/recovery was observed, with the shutdown timing limitation noted under S3.                 |
 
 ## Mentro WebApp gates
 
-| Gate | Status | Evidence and remaining work |
-| --- | --- | --- |
-| M4 | BLOCKED | The frontend's static routes render, but this repository's preview has no containerized Mentro server. A known-input analysis through the actual server, expected results, and chat completion remain unverified. |
-| M5 | BLOCKED | No actual isolated Supabase service was available. Sign-in, session reload, history save/retrieve/delete, sign-out, and two-user isolation were not tested. |
-| M6 | BLOCKED | Frontend configuration points to the explicit local proxy/Auth addresses, but neither service is running here. Auth headers, origins, streaming, and the delivered serving path through the actual server remain unverified. |
+| Gate | Status  | Evidence and remaining work                                                                                                                                                                                                  |
+| ---- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M4   | BLOCKED | The frontend's static routes render, but this repository's preview has no containerized Mentro server. A known-input analysis through the actual server, expected results, and chat completion remain unverified.            |
+| M5   | BLOCKED | No actual isolated Supabase service was available. Sign-in, session reload, history save/retrieve/delete, sign-out, and two-user isolation were not tested.                                                                  |
+| M6   | BLOCKED | Frontend configuration points to the explicit local proxy/Auth addresses, but neither service is running here. Auth headers, origins, streaming, and the delivered serving path through the actual server remain unverified. |
 
 The PR should remain draft while S1–S3, S5, S7, M4–M6, and the existing S2
 failures remain open. Local frontend fixtures and static-container checks do not
@@ -109,3 +109,21 @@ The first PR CI container job passed and quality failed on those known baseline
 files. Vercel's existing preview integration also reported failure; its build-log
 connector was unavailable, so the cause remains unverified. No Vercel settings
 were changed. Current commit/image/CI is maintained in the final PR handoff.
+
+## Follow-up browser validation
+
+On 2026-09-24 the quality repair passed clean install, formatting, lint, 15 tests,
+and production build. Root browser testing then used the Mentro server's separate
+loopback fixture (PR3 follow-up) through the real production WebApp and API images:
+password sign-in, `/share/fast` analysis (one curiosity prompt, score27, four estimated
+tokens), authenticated streamed `Hello world`, history retrieval and reload passed.
+The fixture initially omitted PostgREST's `accept-profile`/`content-profile` CORS
+headers; its corrected allowlist and preflight regression resolved the browser
+history failure. This is fixture evidence only; M5 actual Supabase remains blocked.
+
+Signed-in mobile testing also reproduced a clipped Sign out control in Header.
+At widths below 640px the authenticated controls now use icons with retained
+accessible names and titles; desktop labels remain visible. Browser regression
+checks at 390px and 320px verified every control stays within the viewport, each
+has a 44x44px target, and Sign out works. History survived page reload within the
+fixture's lifetime. The full fixture is disposable, with no durable database claim.
