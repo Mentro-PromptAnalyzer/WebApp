@@ -63,3 +63,25 @@ edit did not rerun the checks.
 The PR should remain draft while S1–S3, S5, S7, M4–M6, and the existing S2
 failures remain open. Local frontend fixtures and static-container checks do not
 prove actual server behavior or Supabase Auth/history isolation.
+
+## Integration follow-up
+
+The real local Mentro server became available after the snapshot. In the browser,
+`https://chatgpt.com/share/browser` was fetched through localhost3001 using the
+server's controlled Chromium fixture. Results showed one prompt,100% delegation,
+overall4/100 and seven estimated tokens; console errors/warnings were empty.
+This passes the unauthenticated analysis portion of M4, not authenticated chat
+or M5 history/isolation.
+
+Integration inspection found that the existing chat client never sent a bearer
+token. It now obtains the current session from the existing Supabase client,
+attaches Authorization, and asks signed-out users to sign in before making a
+request. Three additional regression tests cover token/end processing, signed-out
+refusal and a server-rejected session. The suite now has13passing tests. The
+same edit preserves the caught network error as cause; remaining baseline lint
+is14errors/1warning. Two public HTML formatting failures remain.
+
+The first PR CI container job passed and quality failed on those known baseline
+files. Vercel's existing preview integration also reported failure; its build-log
+connector was unavailable, so the cause remains unverified. No Vercel settings
+were changed. Current commit/image/CI is maintained in the final PR handoff.
