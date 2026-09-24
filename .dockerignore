@@ -1,0 +1,11 @@
+**
+!mentro/
+!mentro/**
+!nginx/
+!nginx/nginx.conf
+mentro/node_modules
+mentro/dist
+**/.env*
+**/*.test.*
+**/*.md
+**/.git

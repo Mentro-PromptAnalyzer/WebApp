@@ -25,46 +25,29 @@ All analysis runs client-side using a rule-based TypeScript engine — no API ke
 
 ## Local Development
 
-### 1) Install dependencies
+The WebApp source and lockfile are in `mentro/`. The Express proxy server is
+maintained in the separate `Mentro-PromptAnalyzer/server` repository; this
+repository does not contain or recreate that server.
+
+For the local production-container preview, including required public build
+configuration and startup, health, stop, restart, and recovery commands, follow
+the [container runbook](docs/container-runbook.md).
+
+To install and check the frontend directly, use Node.js 24 from `mentro/`:
 
 ```bash
-npm install
+cd mentro
+npm ci
+npm run format:check
+npm run lint
+npm test
+npm run build
 ```
 
-### 2) Configure environment variables
-
-Create `server/.env`:
-
-```bash
-GROQ_API_KEY=your_groq_api_key
-# optional:
-# SUPABASE_URL=...
-# SUPABASE_ANON_KEY=...
-# CHROMIUM_PATH=/path/to/chromium  (for Puppeteer fallback)
-```
-
-Optional frontend override in `mentro/.env.local`:
-
-```bash
-VITE_PROXY_URL=http://localhost:3001
-```
-
-If `VITE_PROXY_URL` is not set, frontend defaults to `http://localhost:3001`.
-
-### 3) Run server and frontend
-
-Run both:
-
-```bash
-npm run dev
-```
-
-Or separately:
-
-```bash
-npm run start --prefix server
-npm run dev --prefix mentro
-```
+The frontend's public build configuration is validated before building. Never
+put privileged Supabase keys in `VITE_` variables. The runbook documents the
+local fixture addresses and their limits; they do not provide real Auth or
+history integration.
 
 ## Tech Stack
 

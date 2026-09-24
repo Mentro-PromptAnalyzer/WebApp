@@ -1,11 +1,11 @@
+import { API_BASE as PROXY_BASE } from './apiConfig';
+
 export type ChatRole = 'user' | 'assistant' | 'system';
 
 export interface ChatMessage {
   role: ChatRole;
   content: string;
 }
-
-const PROXY_BASE: string = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
 
 interface StreamHandlers {
   onToken: (text: string) => void;

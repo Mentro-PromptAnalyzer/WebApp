@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently --names \"server,client\" --prefix-colors \"yellow,cyan\" \"npm start --prefix server\" \"npm run dev --prefix mentro\"",
-    "postinstall": "npm install --prefix mentro && npm install --prefix server",
-    "format": "npm run format --prefix mentro && npm run format --prefix server"
+    "dev": "npm run dev --prefix mentro",
+    "postinstall": "npm ci --prefix mentro",
+    "build": "npm run build --prefix mentro",
+    "lint": "npm run lint --prefix mentro",
+    "test": "npm test --prefix mentro",
+    "format": "npm run format --prefix mentro",
+    "format:check": "npm run format:check --prefix mentro",
+    "test:smoke": "node --test tests/http-smoke.test.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

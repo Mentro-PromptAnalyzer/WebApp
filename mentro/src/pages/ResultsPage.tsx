@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_BASE as SERVER_URL } from '../lib/apiConfig';
 import { useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -334,8 +335,6 @@ export function ResultsPage() {
     null
   );
   const [providerWarning, setProviderWarning] = useState('');
-
-  const SERVER_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
 
   // Auto-fetch token count for non-OpenAI providers on mount
   useState(() => {
