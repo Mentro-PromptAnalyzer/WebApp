@@ -1,5 +1,29 @@
 # Mentro WebApp container validation
 
+## Current quality follow-up (2026-09-24)
+
+The prior pilot snapshot below records the original failures. On the current task
+branch, formatting and lint now pass without suppressing rules. The Results page
+routes a missing analysis through React Router, keeps its hooks in a stable
+component, initializes the chat summary without a render-time state update, and
+cancels token requests when unmounted. Auth context and its hook live in separate
+modules for Fast Refresh. Chart payloads use explicit types; the dashboard retry
+path uses a request callback rather than a synchronous effect state update.
+
+`npm run format:check`, `npm run lint`, `npm test` (15 tests across three files),
+and `npm run build` passed from `mentro/` with the runbook's local public build
+values. Two Results page regression tests cover a valid analysis and a direct
+`/results` render with missing route state. The production build still reports a
+large JavaScript chunk (about 6.5 MB); bundle splitting is separate work.
+
+The exact committed-image smoke and remote PR checks are recorded in the PR
+description after delivery. Authenticated browser chat awaits the separate
+Mentro server's loopback fixture; actual isolated Supabase Auth/history and
+two-user checks remain blocked. The existing Vercel preview failure needs its
+own deployment-log diagnosis and does not establish a local container failure.
+
+## Initial pilot snapshot (historical)
+
 Snapshot for the local WebApp container pilot. Shared criteria are from
 `hosting-ops/docs/migration-completion-gates.md`; this report records local
 evidence separately from actual Auth and server integration.

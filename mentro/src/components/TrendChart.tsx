@@ -48,6 +48,18 @@ interface ChartDataPoint {
   historyItem: AnalysisHistory;
 }
 
+interface TooltipEntry {
+  payload?: ChartDataPoint;
+  dataKey?: string | number;
+  color?: string;
+  value?: string | number;
+}
+
+interface LegendEntry {
+  value?: string;
+  color?: string;
+}
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -89,17 +101,13 @@ function getFilteredHistory(history: AnalysisHistory[], timeFrame: TimeFrame): A
 }
 
 // Custom tooltip component with chat info and navigation
-function CustomTooltip({ active, payload }: any) {
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: TooltipEntry[] }) {
   const navigate = useNavigate();
-
-  // Debug: log when tooltip is called
-  console.log('Tooltip called:', { active, payloadLength: payload?.length, payload });
 
   if (!active || !payload || payload.length === 0) return null;
 
   const data = payload[0]?.payload as ChartDataPoint | undefined;
   if (!data) {
-    console.log('No data in payload');
     return null;
   }
 
@@ -164,10 +172,10 @@ function CustomTooltip({ active, payload }: any) {
 
       {/* Score breakdown */}
       <div className="space-y-1.5 pt-2 border-t" style={{ borderColor: BORDER }}>
-        {payload.map((entry: { dataKey: string; color: string; value: number }) => {
+        {payload.map((entry) => {
           if (entry.dataKey === 'Overall') return null;
           return (
-            <div key={entry.dataKey} className="flex justify-between items-center text-xs">
+            <div key={String(entry.dataKey)} className="flex justify-between items-center text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span style={{ color: TEXT_MUTED }}>{entry.dataKey}:</span>
@@ -184,12 +192,12 @@ function CustomTooltip({ active, payload }: any) {
 }
 
 // Custom legend component with perfect vertical alignment
-function CustomLegend({ payload }: any) {
+function CustomLegend({ payload }: { payload?: LegendEntry[] }) {
   if (!payload || payload.length === 0) return null;
 
   return (
     <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4">
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <div key={`legend-${index}`} className="flex items-center gap-1.5">
           <div className="w-3 h-0.5 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-xs" style={{ color: entry.color }}>

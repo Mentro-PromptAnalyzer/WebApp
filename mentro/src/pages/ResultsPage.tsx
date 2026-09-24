@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { API_BASE as SERVER_URL } from '../lib/apiConfig';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import {
   ArrowLeft,
   MessageSquare,
@@ -220,15 +220,25 @@ export function ResultsPage() {
   const location = useLocation();
   const result = location.state?.result as AnalysisResult | undefined;
   const detectedPlatform = location.state?.detectedPlatform as string | undefined;
+
+  if (!result) {
+    return <Navigate to="/#analyze" replace />;
+  }
+
+  return <ResultsContent key={location.key} result={result} detectedPlatform={detectedPlatform} />;
+}
+
+function ResultsContent({
+  result,
+  detectedPlatform,
+}: {
+  result: AnalysisResult;
+  detectedPlatform?: string;
+}) {
   const autoProvider = platformToProvider(detectedPlatform);
 
   // Analysis is saved to chat_histories from InputPage before navigating here.
   // No separate save needed — the dashboard reads from the same table.
-
-  if (!result) {
-    window.location.href = '/#analyze';
-    return null;
-  }
 
   const totalMessages = result.prompts.length;
   const duration = estimateDuration(totalMessages);
@@ -314,13 +324,14 @@ export function ResultsPage() {
     })),
   ];
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: 'assistant',
+      content: result.summary || 'Analysis complete. How can I help you improve your prompts?',
+    },
+  ]);
   const [input, setInput] = useState('');
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isStreaming, setIsStreaming] = useState(false);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [chatError, setChatError] = useState('');
   const [showActionButtons, setShowActionButtons] = useState(true);
 
@@ -337,11 +348,12 @@ export function ResultsPage() {
   const [providerWarning, setProviderWarning] = useState('');
 
   // Auto-fetch token count for non-OpenAI providers on mount
-  useState(() => {
+  useEffect(() => {
     if (autoProvider === 'openai') return;
 
     const providerOption = PROVIDER_OPTIONS.find((p) => p.provider === autoProvider);
     if (!providerOption || providerOption.comingSoon) return;
+    const controller = new AbortController();
 
     const fetchTokens = async () => {
       const msgs = result.prompts.map((p) => ({ role: 'user', content: p.text }));
@@ -356,7 +368,10 @@ export function ResultsPage() {
             model: providerOption.model,
             messages: msgs,
           }),
+          signal: controller.signal,
         });
+
+        if (controller.signal.aborted) return;
 
         if (!response.ok) {
           const concatenated = result.prompts.map((p) => p.text).join('\n');
@@ -375,9 +390,11 @@ export function ResultsPage() {
         }
 
         const data: NormalizedTokenResponse = await response.json();
+        if (controller.signal.aborted) return;
         setProviderTokenResult(data);
         if (data.warning) setProviderWarning(data.warning);
       } catch (err) {
+        if (controller.signal.aborted) return;
         const concatenated = result.prompts.map((p) => p.text).join('\n');
         const fallback = estimateTokens(concatenated);
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -392,25 +409,13 @@ export function ResultsPage() {
           `Could not reach the token counting server. Showing local estimation instead.`
         );
       } finally {
-        setIsCountingTokens(false);
+        if (!controller.signal.aborted) setIsCountingTokens(false);
       }
     };
 
     void fetchTokens();
-  });
-
-  // Generate initial AI message on mount
-  useState(() => {
-    const generateInitialMessage = () => {
-      // Use the summary from the analysis result
-      const initialMessage =
-        result.summary || 'Analysis complete. How can I help you improve your prompts?';
-
-      setMessages([{ role: 'assistant' as const, content: initialMessage }]);
-    };
-
-    generateInitialMessage();
-  });
+    return () => controller.abort();
+  }, [autoProvider, result]);
 
   /**
    * Extract revised prompt text from an assistant message.
