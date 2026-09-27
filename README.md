@@ -2,7 +2,7 @@
 
 **Better questions, better answers.**
 
-🔗 [Live App](https://ask-better-kiro-hacks.vercel.app/) · [Devpost](https://kiro-hacks-cal-poly.devpost.com/)
+🔗 [Live App](https://mentro.elischiffler.dev/) · [Devpost](https://kiro-hacks-cal-poly.devpost.com/)
 
 **Demo Login:** `eschiffler1122@gmail.com` / `Testing1!`
 
@@ -50,6 +50,12 @@ VITE_PROXY_URL=http://localhost:3001
 ```
 
 If `VITE_PROXY_URL` is not set, frontend defaults to `http://localhost:3001`.
+
+For the Vercel production frontend at `https://mentro.elischiffler.dev`, set
+`VITE_PROXY_URL=https://api.mentro.elischiffler.dev` and redeploy only after
+that API hostname has DNS, HTTPS, a healthy backend, and CORS for the frontend
+origin. Vite embeds this value at build time. Until then, keep the existing
+production API value so the live frontend continues to work.
 
 ### 3) Run server and frontend
 
