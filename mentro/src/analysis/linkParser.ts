@@ -1,4 +1,5 @@
 import { parseConversation } from './parser';
+import { fetchProtectedApi } from '../lib/protectedApi';
 
 // ---------------------------------------------------------------------------
 // Config — server proxy URL
@@ -222,11 +223,15 @@ export async function fetchSharedConversation(url: string): Promise<string> {
 
   let response: Response;
   try {
-    response = await fetch(`${PROXY_BASE}/api/fetch-share?url=${encodeURIComponent(url)}`, {
-      signal: AbortSignal.timeout(60_000),
-    });
-  } catch {
-    throw new Error('SERVER_UNREACHABLE');
+    response = await fetchProtectedApi(
+      `${PROXY_BASE}/api/fetch-share?url=${encodeURIComponent(url)}`,
+      {
+        signal: AbortSignal.timeout(60_000),
+      }
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message === 'AUTH_REQUIRED') throw error;
+    throw new Error('SERVER_UNREACHABLE', { cause: error });
   }
 
   let data: { html?: string; error?: string };
@@ -289,11 +294,15 @@ export async function getPromptsAndTimestamp(
 
   let response: Response;
   try {
-    response = await fetch(`${PROXY_BASE}/api/fetch-share?url=${encodeURIComponent(trimmed)}`, {
-      signal: AbortSignal.timeout(60_000),
-    });
-  } catch {
-    throw new Error('SERVER_UNREACHABLE');
+    response = await fetchProtectedApi(
+      `${PROXY_BASE}/api/fetch-share?url=${encodeURIComponent(trimmed)}`,
+      {
+        signal: AbortSignal.timeout(60_000),
+      }
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message === 'AUTH_REQUIRED') throw error;
+    throw new Error('SERVER_UNREACHABLE', { cause: error });
   }
 
   let data: { html?: string; error?: string };
@@ -330,6 +339,8 @@ export function getLinkErrorMessage(errorCode: string): string {
   }
 
   switch (errorCode) {
+    case 'AUTH_REQUIRED':
+      return 'Sign in to analyze a shared conversation.';
     case 'SERVER_UNREACHABLE':
       return "The Mentro proxy server isn't running. Please try again later.";
     case 'FETCH_FAILED':
