@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, ArrowRight, Loader2, Inbox } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { Header } from '../components/Header';
 import { fetchHistory, deleteHistory, type ChatHistoryRow } from '../lib/chatHistory';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 
 type Mode = 'login' | 'signup';
 

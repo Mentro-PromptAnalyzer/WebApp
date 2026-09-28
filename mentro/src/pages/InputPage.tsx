@@ -9,7 +9,7 @@ import {
   detectPlatform,
 } from '../analysis/linkParser';
 import { Header } from '../components/Header';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { saveAnalysis } from '../lib/chatHistory';
 
 // ---------------------------------------------------------------------------

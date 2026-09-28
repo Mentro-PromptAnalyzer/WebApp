@@ -2,13 +2,12 @@
 import { defineConfig, mergeConfig } from 'vite';
 import viteConfig from './vite.config';
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
+export default defineConfig((env) =>
+  mergeConfig(viteConfig(env), {
     test: {
       globals: false,
       environment: 'node',
-      passWithNoTests: true,
+      passWithNoTests: false,
     },
-  }),
+  })
 );

@@ -1,11 +1,10 @@
 import { parseConversation } from './parser';
+import { API_BASE as PROXY_BASE } from '../lib/apiConfig';
 import { fetchProtectedApi } from '../lib/protectedApi';
 
 // ---------------------------------------------------------------------------
 // Config — server proxy URL
 // ---------------------------------------------------------------------------
-
-const PROXY_BASE: string = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001';
 
 // ---------------------------------------------------------------------------
 // Supported AI platforms

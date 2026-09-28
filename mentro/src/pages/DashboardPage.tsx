@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { getDashboardStats, type DashboardStats } from '../lib/dashboardService';
 import { Header } from '../components/Header';
 import { TrendChart } from '../components/TrendChart';
@@ -20,27 +20,32 @@ export function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user]);
-
-  async function loadDashboardData() {
     if (!user) return;
+    let cancelled = false;
+    getDashboardStats(user.id)
+      .then((dashboardStats) => {
+        if (!cancelled) setStats(dashboardStats);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        console.error('Error loading dashboard:', err);
+        setError('Failed to load dashboard data. Please try again.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, retryCount]);
 
-    try {
-      setLoading(true);
-      setError(null);
-      const dashboardStats = await getDashboardStats(user.id);
-      setStats(dashboardStats);
-    } catch (err) {
-      console.error('Error loading dashboard:', err);
-      setError('Failed to load dashboard data. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  function retryDashboardData() {
+    setLoading(true);
+    setError(null);
+    setRetryCount((count) => count + 1);
   }
 
   if (authLoading || loading) {
@@ -70,7 +75,7 @@ export function DashboardPage() {
               {error}
             </p>
             <button
-              onClick={loadDashboardData}
+              onClick={retryDashboardData}
               className="px-4 py-2 rounded-lg font-medium transition-all"
               style={{ backgroundColor: '#7c3aed', color: TEXT_PRIMARY }}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6d28d9')}
