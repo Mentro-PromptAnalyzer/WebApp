@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "preview": "vite preview",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "test:provider-history": "node tests/provider-history.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
