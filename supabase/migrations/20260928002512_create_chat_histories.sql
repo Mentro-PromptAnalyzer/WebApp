@@ -1,5 +1,5 @@
 -- Contains user prompt text in analysis_result. Apply only after the
--- retention/privacy decision and isolated Auth/RLS acceptance in docs/history-recovery.md.
+-- retention/privacy decision and isolated Auth/RLS acceptance in HISTORY-ACCEPTANCE.md.
 create table public.chat_histories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
