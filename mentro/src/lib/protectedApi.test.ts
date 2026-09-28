@@ -44,4 +44,30 @@ describe('fetchProtectedApi', () => {
     );
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('preserves session retrieval errors instead of asking the user to sign in', async () => {
+    const sessionError = new Error('Session refresh unavailable');
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: { session: null },
+      error: sessionError,
+    } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    const fetchMock = vi.spyOn(globalThis, 'fetch');
+
+    await expect(fetchProtectedApi('https://api.example.test/api/fetch-share')).rejects.toBe(
+      sessionError
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('asks for sign-in when the server rejects the bearer token', async () => {
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: { session: { access_token: 'expired-token' } },
+      error: null,
+    } as Awaited<ReturnType<typeof supabase.auth.getSession>>);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 401 }));
+
+    await expect(fetchProtectedApi('https://api.example.test/api/fetch-share')).rejects.toThrow(
+      'AUTH_REQUIRED'
+    );
+  });
 });

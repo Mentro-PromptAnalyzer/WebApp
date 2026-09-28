@@ -391,7 +391,9 @@ export function ResultsPage() {
           warning: `Failed to reach server: ${message}. Fell back to local estimation.`,
         });
         setProviderWarning(
-          `Could not reach the token counting server. Showing local estimation instead.`
+          message === 'AUTH_REQUIRED'
+            ? 'Sign in for provider token counting. Showing local estimation instead.'
+            : 'Could not reach the token counting server. Showing local estimation instead.'
         );
       } finally {
         setIsCountingTokens(false);
