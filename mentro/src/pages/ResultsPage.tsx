@@ -16,6 +16,7 @@ import type { AnalysisResult } from '../analysis/types';
 import { Header } from '../components/Header';
 import { TokenUsageCard } from '../components/TokenUsageCard';
 import { streamChatReply, type ChatMessage } from '../lib/chatClient';
+import { fetchProtectedApi } from '../lib/protectedApi';
 import {
   PROVIDER_OPTIONS,
   type TokenProvider,
@@ -349,7 +350,7 @@ export function ResultsPage() {
       setIsCountingTokens(true);
 
       try {
-        const response = await fetch(`${SERVER_URL}/api/count-tokens`, {
+        const response = await fetchProtectedApi(`${SERVER_URL}/api/count-tokens`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -390,7 +391,9 @@ export function ResultsPage() {
           warning: `Failed to reach server: ${message}. Fell back to local estimation.`,
         });
         setProviderWarning(
-          `Could not reach the token counting server. Showing local estimation instead.`
+          message === 'AUTH_REQUIRED'
+            ? 'Sign in for provider token counting. Showing local estimation instead.'
+            : 'Could not reach the token counting server. Showing local estimation instead.'
         );
       } finally {
         setIsCountingTokens(false);
