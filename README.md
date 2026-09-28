@@ -2,7 +2,7 @@
 
 **Better questions, better answers.**
 
-🔗 [Live App](https://ask-better-kiro-hacks.vercel.app/) · [Devpost](https://kiro-hacks-cal-poly.devpost.com/)
+🔗 [Live App](https://mentro.elischiffler.dev/) · [Devpost](https://kiro-hacks-cal-poly.devpost.com/)
 
 **Demo Login:** `eschiffler1122@gmail.com` / `Testing1!`
 
@@ -48,6 +48,12 @@ The frontend's public build configuration is validated before building. Never
 put privileged Supabase keys in `VITE_` variables. The runbook documents the
 local fixture addresses and their limits; they do not provide real Auth or
 history integration.
+
+For the Vercel production frontend at `https://mentro.elischiffler.dev`, only
+switch `VITE_PROXY_URL` to `https://api.mentro.elischiffler.dev` after that API
+hostname has DNS, HTTPS, a healthy backend, and CORS for the frontend origin.
+Vite embeds this value at build time; keep the current production API value
+until those cutover conditions are met.
 
 ## Tech Stack
 
