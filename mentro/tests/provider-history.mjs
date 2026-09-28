@@ -47,6 +47,7 @@ const signIn = async (client, label) => {
 };
 
 const ownedIds = [];
+let testError;
 try {
   const [ownerA, ownerB] = await Promise.all([signIn(a, 'A'), signIn(b, 'B')]);
   assert.notEqual(ownerA, ownerB);
@@ -110,16 +111,40 @@ try {
   assert.equal(crossDelete.data.length, 0, 'B must not delete A history');
   assert.equal((await read(a, aRow.id)).length, 1);
 
+  const ownerDelete = await a.from('chat_histories').delete().eq('id', aRow.id).select('id');
+  if (ownerDelete.error) throw ownerDelete.error;
+  assert.equal(ownerDelete.data.length, 1, 'A must be able to delete its own history');
+  assert.equal((await read(a, aRow.id)).length, 0, 'A history must stay deleted');
+
   const update = await a.from('chat_histories').update({ title: 'forbidden' }).eq('id', aRow.id);
   assert.ok(update.error, 'Client updates are not part of the WebApp contract');
 
   console.log(
     'PASS: isolated two-user Auth, owner read/insert/delete, anonymous denial, JSON round-trip'
   );
+} catch (error) {
+  testError = error;
 } finally {
+  const cleanupErrors = [];
   for (const { client, id } of ownedIds) {
     const { error } = await client.from('chat_histories').delete().eq('id', id);
-    if (error) console.error(`Cleanup failed for ${id}: ${error.message}`);
+    if (error) {
+      cleanupErrors.push(error);
+      continue;
+    }
+    const remaining = await client.from('chat_histories').select('id').eq('id', id);
+    if (remaining.error) cleanupErrors.push(remaining.error);
+    else if (remaining.data.length !== 0) {
+      cleanupErrors.push(new Error('Test history remained after cleanup'));
+    }
   }
-  await Promise.all([a.auth.signOut(), b.auth.signOut()]);
+  const signOutResults = await Promise.all([a.auth.signOut(), b.auth.signOut()]);
+  cleanupErrors.push(...signOutResults.map(({ error }) => error).filter(Boolean));
+  if (testError && cleanupErrors.length > 0) {
+    throw new AggregateError([testError, ...cleanupErrors], 'Acceptance and cleanup both failed');
+  }
+  if (cleanupErrors.length > 0) {
+    throw new AggregateError(cleanupErrors, 'Provider history acceptance cleanup failed');
+  }
 }
+if (testError) throw testError;
